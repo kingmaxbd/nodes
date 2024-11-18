@@ -1,13 +1,24 @@
 import requests
 import json
 import subprocess
+import time
 from datetime import datetime
 
-def get_recent_blocks(url):
-    """Получаем последние блоки из указанного URL."""
-    response = requests.get(url)
-    response.raise_for_status()  # Проверка на ошибки запроса
-    return response.json()
+def get_recent_blocks(url, retries=3, delay=5):
+    """Получаем последние блоки из указанного URL с повторными попытками."""
+    for attempt in range(retries):
+        try:
+            response = requests.get(url)
+            response.raise_for_status()  # Проверка на ошибки запроса
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            print(f"Ошибка при получении данных: {e}")
+            if attempt < retries - 1:
+                print(f"Повторная попытка через {delay} секунд...")
+                time.sleep(delay)  # Ждём перед следующей попыткой
+            else:
+                print("Не удалось получить данные после нескольких попыток.")
+                return None  # Возвращаем None, если не удалось после всех попыток
 
 def calculate_average_fee(blocks):
     """Рассчитываем среднюю medianFee."""
@@ -46,7 +57,7 @@ def update_service_fee(new_fee):
         with open(config_file, 'w') as file:
             file.writelines(config_data)
 
-        # Перезагрузка демон systemd и перезапуск сервис
+        # Перезагрузка демона и перезапуск сервиса
         subprocess.run(['sudo', 'systemctl', 'daemon-reload'], check=True)
         subprocess.run(['sudo', 'systemctl', 'restart', 'hemi.service'], check=True)
 
@@ -55,9 +66,9 @@ def update_service_fee(new_fee):
 
 def main():
     url = 'https://mempool.space/testnet/api/v1/blocks'
-    try:
-        blocks = get_recent_blocks(url)
+    blocks = get_recent_blocks(url)
 
+    if blocks is not None:
         # Рассчитываем среднюю medianFee
         average_fee = calculate_average_fee(blocks)
 
@@ -66,9 +77,8 @@ def main():
 
         # Выводим результаты
         print(f"Установлено среднее значение комиссии для hemi: {average_fee} на {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-
-    except Exception as e:
-        print(f"Произошла ошибка: {e}")
+    else:
+        print("Не удалось обновить комиссию из-за ошибки.")
 
 if __name__ == '__main__':
     main()
