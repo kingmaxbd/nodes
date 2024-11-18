@@ -1,6 +1,6 @@
 import requests
-import json
 import subprocess
+import re
 import time
 from datetime import datetime
 
@@ -15,7 +15,7 @@ def get_recent_blocks(url, retries=3, delay=5):
             print(f"Ошибка при получении данных: {e}")
             if attempt < retries - 1:
                 print(f"Повторная попытка через {delay} секунд...")
-                time.sleep(delay)  # Ждём перед следующей попыткой
+                time.sleep(delay)  # Ждем перед следующей попыткой
             else:
                 print("Не удалось получить данные после нескольких попыток.")
                 return None  # Возвращаем None, если не удалось после всех попыток
@@ -41,15 +41,15 @@ def calculate_average_fee(blocks):
     return round(average_median_fee)  # Округление результата до целого числа
 
 def update_service_fee(new_fee):
-    """Обновляем конфигурацию службы с новым значением комиссии."""
+    """Обновление конфигурации службы с новым значением комиссии."""
     config_file = '/etc/systemd/system/hemi.service'
     try:
         with open(config_file, 'r') as file:
             config_data = file.readlines()
-        
-        # Изменяем строку с Environment, если она найдена
+
+        # Изменение строки с Environment, если найдена
         for i, line in enumerate(config_data):
-            if 'Environment="POPM_STATIC_FEE=' in line:
+            if re.search(r'Environment="POPM_STATIC_FEE=', line):
                 config_data[i] = f'Environment="POPM_STATIC_FEE={new_fee}"\n'
                 break
 
@@ -72,11 +72,13 @@ def main():
         # Рассчитываем среднюю medianFee
         average_fee = calculate_average_fee(blocks)
 
-        # Обновляем службу с новым значением комиссии
-        update_service_fee(average_fee)
-
-        # Выводим результаты
-        print(f"Установлено среднее значение комиссии для hemi: {average_fee} на {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        # Проверка, если average_fee равен 0 или 1, не обновляем
+        if average_fee in [0, 1]:
+            print(f"Не обновлено: получено недопустимое значение комиссии: {average_fee}.")
+        else:
+            # Обновляем службу с новым значением комиссии
+            update_service_fee(average_fee)
+            print(f"Установлено среднее значение комиссии для hemi: {average_fee} на {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     else:
         print("Не удалось обновить комиссию из-за ошибки.")
 
