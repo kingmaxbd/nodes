@@ -11,10 +11,10 @@ crontab -l | grep -v "/root/scripts/hemi_min_free_2h.sh" | crontab -
 mkdir -p /root/scripts
 
 # Скачуємо файл і перейменовуємо його
-# curl -o /root/scripts/hemi_min_free_2h.sh https://raw.githubusercontent.com/RomanTsibii/nodes/main/hemi/min_free_2h.sh
-curl -o /root/scripts/hemi_min_free_2h.sh https://raw.githubusercontent.com/kingmaxbd/nodes/refs/heads/main/avarage_fee.py
+
+curl -o /root/scripts/hemi_min_free_2h.py https://raw.githubusercontent.com/kingmaxbd/nodes/refs/heads/main/avarage_fee.py
 # Надаємо права на виконання файлу
-chmod +x /root/scripts/hemi_min_free_2h.sh
+chmod +x /root/scripts/hemi_min_free_2h.py
 
 # Додаємо завдання в crontab для запуску кожні 2 години на випадковій хвилині
 # Випадкове число від 0 до 59 для хвилин
@@ -22,4 +22,4 @@ minute=$((RANDOM % 60))
 
 # Записуємо завдання в crontab
 (crontab -l 2>/dev/null; echo "$minute */2 * * * /root/scripts/hemi_min_free_2h.sh >> /root/scripts/hemi_min_free_2h.log 2>&1") | crontab -
-/root/scripts/hemi_min_free_2h.sh >> /root/scripts/hemi_min_free_2h.log
+python3 /root/scripts/hemi_min_free_2h.py >> /root/scripts/hemi_min_free_2h.log
