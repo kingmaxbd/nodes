@@ -21,5 +21,5 @@ chmod +x /root/scripts/hemi_min_free_2h.py
 minute=$((RANDOM % 60))
 
 # Записуємо завдання в crontab
-(crontab -l 2>/dev/null; echo "$minute */2 * * * /root/scripts/hemi_min_free_2h.py >> /root/scripts/hemi_min_free_2h.log 2>&1") | crontab -
+(crontab -l 2>/dev/null; echo "$minute */2 * * * python3 /root/scripts/hemi_min_free_2h.py >> /root/scripts/hemi_min_free_2h.log 2>&1") | crontab -
 python3 /root/scripts/hemi_min_free_2h.py >> /root/scripts/hemi_min_free_2h.log
