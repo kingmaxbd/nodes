@@ -5,7 +5,7 @@
 # tail -n 50 /root/scripts/hemi_min_free_2h.log
 # bash <(curl -s https://raw.githubusercontent.com/RomanTsibii/nodes/main/hemi/crontab.sh)
 # видалити кронтаб
-crontab -l | grep -v "/root/scripts/hemi_min_free_2h.sh" | crontab -
+crontab -l | grep -v '/root/scripts/hemi_min_free_2h.log' | crontab -
 
 # Створюємо папку scripts, якщо її не існує
 mkdir -p /root/scripts
@@ -21,5 +21,5 @@ chmod +x /root/scripts/hemi_min_free_2h.py
 minute=$((RANDOM % 60))
 
 # Записуємо завдання в crontab
-(crontab -l 2>/dev/null; echo "$minute */2 * * * /root/scripts/hemi_min_free_2h.sh >> /root/scripts/hemi_min_free_2h.log 2>&1") | crontab -
+(crontab -l 2>/dev/null; echo "$minute */2 * * * /root/scripts/hemi_min_free_2h.py >> /root/scripts/hemi_min_free_2h.log 2>&1") | crontab -
 python3 /root/scripts/hemi_min_free_2h.py >> /root/scripts/hemi_min_free_2h.log
