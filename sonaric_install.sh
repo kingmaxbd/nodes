@@ -34,17 +34,6 @@ print_message() {
 command_exists() {
   command -v "$@" > /dev/null 2>&1
 }
-
-echo "Detecting OS..."
-
-lsb_dist=$(lsb_release -si | tr '[:upper:]' '[:lower:]')
-dist_version=$(lsb_release -sr)
-
-if [ "$lsb_dist" != "ubuntu" ] || [ "$dist_version" != "22.04" ]; then
-  echo "ERROR: This script only supports Ubuntu 22.04"
-  exit 1
-fi
-
 do_install() {
   print_message "Installing Sonaric..."
 
@@ -69,5 +58,4 @@ do_install() {
   
   echo "Sonaric installation completed."
 }
-
 do_install
