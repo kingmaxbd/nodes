@@ -1,7 +1,7 @@
 #! /bin/bash
 
 function get_status() {
-    STATUS=$(cd $HOME/shardeum && ./operator-cli.sh status | grep state | awk '{ print $2 }')
+    STATUS=$(docker exec -it shardeum-validator operator-cli status | grep state | awk '{ print $2 }')
     echo "${STATUS}"
 }
 
