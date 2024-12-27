@@ -16,7 +16,7 @@ do
     sleep 5s
     if [[ "${NODE_STATUS}" =~ "stopped" ]]; then
         printf "Start shardeum node and wait 5 minutes\n"
-        cd $HOME/shardeum && ./operator-cli.sh start
+        docker exec -it shardeum-validator operator-cli start
         sleep 5m
     else
         date=$(date +"%H:%M")
